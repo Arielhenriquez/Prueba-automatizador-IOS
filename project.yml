@@ -1,0 +1,54 @@
+name: ContactsApp
+options:
+  bundleIdPrefix: com.waldishenriquez
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+targets:
+  ContactsApp:
+    type: application
+    platform: iOS
+    sources:
+      - ContactsApp
+    info:
+      path: ContactsApp/Info.plist
+      properties:
+        UILaunchScreen: {}
+        CFBundleDisplayName: Contactos
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.waldishenriquez.contactsapp
+        SWIFT_VERSION: 5.9
+        TARGETED_DEVICE_FAMILY: 1
+
+  ContactsAppTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - ContactsAppTests
+    dependencies:
+      - target: ContactsApp
+
+  ContactsAppUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - ContactsAppUITests
+      - path: ContactsApp/Support/AccessibilityIdentifiers.swift
+    dependencies:
+      - target: ContactsApp
+
+schemes:
+  ContactsApp:
+    build:
+      targets:
+        ContactsApp: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - ContactsAppTests
+        - ContactsAppUITests
