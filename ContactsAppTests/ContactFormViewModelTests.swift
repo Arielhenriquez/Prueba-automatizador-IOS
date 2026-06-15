@@ -11,7 +11,6 @@ private final class MockImageService: ImageServiceProtocol {
 }
 
 final class ContactFormViewModelTests: XCTestCase {
-
     @MainActor
     private func makeSUT() -> ContactFormViewModel {
         ContactFormViewModel(imageService: MockImageService())
@@ -22,9 +21,7 @@ final class ContactFormViewModelTests: XCTestCase {
     @MainActor
     func test_camposVacios_devuelveNilYError() {
         let sut = makeSUT()
-
         let contact = sut.validateAndBuildContact()
-
         XCTAssertNil(contact)
         XCTAssertEqual(sut.errorMessage, "El nombre es obligatorio.")
     }
@@ -33,7 +30,6 @@ final class ContactFormViewModelTests: XCTestCase {
     func test_apellidoVacio_devuelveError() {
         let sut = makeSUT()
         sut.firstName = "Ana"
-
         XCTAssertNil(sut.validateAndBuildContact())
         XCTAssertEqual(sut.errorMessage, "El apellido es obligatorio.")
     }
@@ -43,7 +39,6 @@ final class ContactFormViewModelTests: XCTestCase {
         let sut = makeSUT()
         sut.firstName = "Ana"
         sut.lastName = "Lopez"
-
         XCTAssertNil(sut.validateAndBuildContact())
         XCTAssertEqual(sut.errorMessage, "El teléfono es obligatorio.")
     }
@@ -54,7 +49,6 @@ final class ContactFormViewModelTests: XCTestCase {
         sut.firstName = "Ana"
         sut.lastName = "Lopez"
         sut.phone = "123"
-
         XCTAssertNil(sut.validateAndBuildContact())
         XCTAssertEqual(sut.errorMessage, "El teléfono no es válido.")
     }
@@ -67,9 +61,7 @@ final class ContactFormViewModelTests: XCTestCase {
         sut.firstName = "  Ana "
         sut.lastName = "Lopez"
         sut.phone = "8095550001"
-
         let contact = sut.validateAndBuildContact()
-
         XCTAssertNotNil(contact)
         XCTAssertNil(sut.errorMessage)
         XCTAssertEqual(contact?.firstName, "Ana") // valida trimming
@@ -78,15 +70,15 @@ final class ContactFormViewModelTests: XCTestCase {
 
     // MARK: - Validación de teléfono (tabla de casos)
 
+    @MainActor
     func test_validacionDeTelefono_casosValidosEInvalidos() {
         XCTAssertTrue(ContactFormViewModel.isValidPhone("8095551234"))
         XCTAssertTrue(ContactFormViewModel.isValidPhone("+1 809-555-1234"))
         XCTAssertTrue(ContactFormViewModel.isValidPhone("809 555 1234"))
-
-        XCTAssertFalse(ContactFormViewModel.isValidPhone("123"))        // muy corto
-        XCTAssertFalse(ContactFormViewModel.isValidPhone("abcdefgh"))   // letras
-        XCTAssertFalse(ContactFormViewModel.isValidPhone(""))           // vacío
-        XCTAssertFalse(ContactFormViewModel.isValidPhone("1------"))    // un solo dígito real
+        XCTAssertFalse(ContactFormViewModel.isValidPhone("123"))
+        XCTAssertFalse(ContactFormViewModel.isValidPhone("abcdefgh"))
+        XCTAssertFalse(ContactFormViewModel.isValidPhone(""))
+        XCTAssertFalse(ContactFormViewModel.isValidPhone("1------"))
     }
 
     // MARK: - Imagen aleatoria
@@ -96,9 +88,7 @@ final class ContactFormViewModelTests: XCTestCase {
         let sut = makeSUT()
         let initialURL = sut.imageURL
         XCTAssertNotNil(initialURL)
-
         sut.loadRandomImage()
-
         XCTAssertNotNil(sut.imageURL)
         XCTAssertNotEqual(sut.imageURL, initialURL, "loadRandomImage debe actualizar imageURL a una URL distinta")
     }

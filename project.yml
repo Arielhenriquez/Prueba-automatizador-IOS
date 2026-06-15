@@ -4,42 +4,50 @@ options:
   deploymentTarget:
     iOS: "16.0"
   createIntermediateGroups: true
-
 targets:
   ContactsApp:
     type: application
     platform: iOS
     sources:
       - ContactsApp
-    info:
-      path: ContactsApp/Info.plist
-      properties:
-        UILaunchScreen: {}
-        CFBundleDisplayName: Contactos
-        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.waldishenriquez.contactsapp
-        SWIFT_VERSION: 5.9
-        TARGETED_DEVICE_FAMILY: 1
-
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Contactos
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
   ContactsAppTests:
     type: bundle.unit-test
     platform: iOS
     sources:
       - ContactsAppTests
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
     dependencies:
       - target: ContactsApp
-
   ContactsAppUITests:
     type: bundle.ui-testing
     platform: iOS
     sources:
       - ContactsAppUITests
       - path: ContactsApp/Support/AccessibilityIdentifiers.swift
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
     dependencies:
       - target: ContactsApp
-
 schemes:
   ContactsApp:
     build:
