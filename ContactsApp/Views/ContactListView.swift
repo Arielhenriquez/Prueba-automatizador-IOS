@@ -1,6 +1,8 @@
 import SwiftUI
 
 /// Pantalla de listado de contactos.
+/// Toolbar: "Borrar" (modo borrado) + título + "Nuevo".
+/// Incluye barra de búsqueda y lista con estados vacíos.
 struct ContactListView: View {
     @StateObject private var viewModel: ContactListViewModel
     private let imageService: ImageServiceProtocol
@@ -44,7 +46,17 @@ struct ContactListView: View {
             }
         }
         .accessibilityIdentifier(A11y.ContactList.screen)
+        .alert("Error al guardar", isPresented: Binding(
+            get: { viewModel.saveError != nil },
+            set: { if !$0 { viewModel.saveError = nil } }
+        )) {
+            Button("OK") { viewModel.saveError = nil }
+        } message: {
+            Text(viewModel.saveError ?? "")
+        }
     }
+
+    // MARK: - Subviews
 
     private var searchBar: some View {
         HStack {
@@ -65,7 +77,8 @@ struct ContactListView: View {
 
     @ViewBuilder
     private var content: some View {
-        if viewModel.filteredContacts.isEmpty {
+        let filtered = viewModel.filteredContacts
+        if filtered.isEmpty {
             VStack(spacing: 8) {
                 Image(systemName: "person.crop.circle.badge.questionmark")
                     .font(.largeTitle)
@@ -77,14 +90,14 @@ struct ContactListView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             List {
-                ForEach(viewModel.filteredContacts) { contact in
+                ForEach(filtered) { contact in
                     ContactRow(
                         contact: contact,
                         isDeleting: isDeleting,
                         onDelete: { viewModel.delete(contact) }
                     )
                 }
-                .onDelete { viewModel.delete(at: $0) }
+                .onDelete(perform: isDeleting ? nil : { viewModel.delete(at: $0) })
             }
             .listStyle(.plain)
             .accessibilityIdentifier(A11y.ContactList.list)
@@ -92,6 +105,7 @@ struct ContactListView: View {
     }
 }
 
+/// Fila individual del listado.
 private struct ContactRow: View {
     let contact: Contact
     let isDeleting: Bool

@@ -1,6 +1,7 @@
 import Foundation
 
 /// ViewModel del formulario de creación (MVVM).
+/// Encapsula validación y construcción del contacto — testeable sin UI.
 @MainActor
 final class ContactFormViewModel: ObservableObject {
     @Published var firstName = ""
@@ -51,10 +52,12 @@ final class ContactFormViewModel: ObservableObject {
                        imageURL: imageURL)
     }
 
-    /// Teléfono válido: opcional "+", inicia con dígito, 7–15 caracteres
-    /// permitiendo dígitos, espacios y guiones.
+    /// Teléfono válido: 7–15 dígitos reales, opcionalmente separados por espacios/guiones y con "+" inicial.
     static func isValidPhone(_ value: String) -> Bool {
-        let pattern = #"^\+?[0-9][0-9\s-]{6,14}$"#
-        return value.range(of: pattern, options: .regularExpression) != nil
+        let digits = value.filter { $0.isNumber }
+        guard digits.count >= 7, digits.count <= 15 else { return false }
+        return value.range(of: Self.phonePattern, options: .regularExpression) != nil
     }
+
+    private static let phonePattern = #"^\+?[0-9][0-9\s-]{6,14}$"#
 }

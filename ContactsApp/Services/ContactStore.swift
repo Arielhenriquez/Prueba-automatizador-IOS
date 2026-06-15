@@ -1,11 +1,17 @@
 import Foundation
 
-/// Abstracción de persistencia. Permite inyectar implementaciones
-/// reales (UserDefaults) o de prueba (en memoria) — Dependency Injection.
-protocol ContactStoreProtocol {
+/// ISP — contrato de solo lectura. Permite inyectar vistas de consulta sin exponer escritura.
+protocol ContactReader {
     func load() -> [Contact]
-    func save(_ contacts: [Contact])
 }
+
+/// ISP — contrato de solo escritura. Permite inyectar escritores sin exponer carga.
+protocol ContactWriter {
+    func save(_ contacts: [Contact]) throws
+}
+
+/// Combinación de ambos protocolos para el caso de uso completo (DI en ViewModels).
+typealias ContactStoreProtocol = ContactReader & ContactWriter
 
 /// Persistencia local simple usando UserDefaults + JSON.
 final class UserDefaultsContactStore: ContactStoreProtocol {
@@ -21,8 +27,8 @@ final class UserDefaultsContactStore: ContactStoreProtocol {
         return (try? JSONDecoder().decode([Contact].self, from: data)) ?? []
     }
 
-    func save(_ contacts: [Contact]) {
-        let data = try? JSONEncoder().encode(contacts)
+    func save(_ contacts: [Contact]) throws {
+        let data = try JSONEncoder().encode(contacts)
         defaults.set(data, forKey: key)
     }
 }
@@ -36,5 +42,5 @@ final class InMemoryContactStore: ContactStoreProtocol {
     }
 
     func load() -> [Contact] { contacts }
-    func save(_ contacts: [Contact]) { self.contacts = contacts }
+    func save(_ contacts: [Contact]) throws { self.contacts = contacts }
 }

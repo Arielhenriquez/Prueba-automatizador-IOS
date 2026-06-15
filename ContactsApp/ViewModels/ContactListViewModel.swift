@@ -1,10 +1,12 @@
 import Foundation
 
 /// ViewModel de la pantalla de listado (MVVM).
+/// Contiene la lógica de filtrado, alta y borrado — sin dependencias de UI.
 @MainActor
 final class ContactListViewModel: ObservableObject {
     @Published var contacts: [Contact] = []
     @Published var searchText: String = ""
+    @Published var saveError: String?
 
     private let store: ContactStoreProtocol
 
@@ -32,12 +34,16 @@ final class ContactListViewModel: ObservableObject {
     /// Soporta swipe-to-delete sobre la lista filtrada.
     func delete(at offsets: IndexSet) {
         let visible = filteredContacts
-        let toDelete = offsets.map { visible[$0] }
-        contacts.removeAll { c in toDelete.contains(where: { $0.id == c.id }) }
+        let toDelete = Set(offsets.map { visible[$0].id })
+        contacts.removeAll { toDelete.contains($0.id) }
         persist()
     }
 
     private func persist() {
-        store.save(contacts)
+        do {
+            try store.save(contacts)
+        } catch {
+            saveError = "No se pudieron guardar los cambios. Intenta nuevamente."
+        }
     }
 }

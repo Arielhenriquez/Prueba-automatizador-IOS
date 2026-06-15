@@ -7,13 +7,24 @@ struct ContactsAppApp: App {
 
     init() {
         let args = ProcessInfo.processInfo.arguments
-        let store = UserDefaultsContactStore()
+        let isUITesting = args.contains("--uitesting-reset")
+                       || args.contains("--uitesting-seed")
+                       || args.contains("--uitesting")
 
+        // UI tests usan un suite aislado para no tocar los datos reales del usuario.
+        let defaults = isUITesting
+            ? (UserDefaults(suiteName: "app.uitesting") ?? .standard)
+            : .standard
+        let store = UserDefaultsContactStore(defaults: defaults)
+
+        // Hooks para automatización de UI (estado determinista):
+        // --uitesting-reset  → arranca sin datos
+        // --uitesting-seed   → arranca con contactos conocidos
         if args.contains("--uitesting-reset") {
-            store.save([])
+            try? store.save([])
         }
         if args.contains("--uitesting-seed") {
-            store.save(Self.seedContacts)
+            try? store.save(Self.seedContacts)
         }
 
         self.store = store

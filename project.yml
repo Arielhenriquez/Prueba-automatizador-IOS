@@ -49,6 +49,9 @@ schemes:
       config: Debug
     test:
       config: Debug
+      gatherCoverageData: true
+      coverageTargets:
+        - ContactsApp
       targets:
         - ContactsAppTests
         - ContactsAppUITests
